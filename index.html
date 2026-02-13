@@ -1,0 +1,146 @@
+<!DOCTYPE html>
+<html>
+<head>
+<title>Cookie Multiverse</title>
+<style>
+body{
+  margin:0;
+  font-family:Arial;
+  background:#1e2a38;
+  color:white;
+  text-align:center;
+  overflow-x:hidden;
+}
+
+h1{margin:10px;}
+
+#mainClick{
+  width:220px;
+  cursor:pointer;
+  transition:0.1s;
+}
+#mainClick:active{transform:scale(0.9);}
+
+.container{
+  display:flex;
+  justify-content:center;
+  flex-wrap:wrap;
+}
+
+.panel{
+  width:300px;
+  background:rgba(255,255,255,0.08);
+  margin:10px;
+  padding:10px;
+  border-radius:15px;
+  max-height:400px;
+  overflow:auto;
+}
+
+button{
+  width:100%;
+  margin:4px 0;
+  padding:6px;
+  border:none;
+  border-radius:8px;
+  background:#f39c12;
+  color:white;
+  font-weight:bold;
+  cursor:pointer;
+}
+button:hover{background:#e67e22;}
+
+input{
+  padding:5px;
+  width:80%;
+}
+
+#snow{
+  position:fixed;
+  width:100%;
+  height:100%;
+  pointer-events:none;
+  display:none;
+}
+.snowflake{
+  position:absolute;
+  color:white;
+  animation:fall linear infinite;
+}
+@keyframes fall{
+  from{transform:translateY(-10px);}
+  to{transform:translateY(100vh);}
+}
+</style>
+</head>
+<body>
+
+<h1 id="worldTitle">🍪 Cookie World</h1>
+<h2>Cookies: <span id="cookies">0</span></h2>
+<h3>CPS: <span id="cps">0</span></h3>
+<h3>Click Power: <span id="cp">1</span></h3>
+
+<img id="mainClick" src="https://upload.wikimedia.org/wikipedia/commons/7/70/Chocolate_chip_cookie.png">
+
+<div class="container">
+
+<div class="panel">
+<h3>Upgrades (30)</h3>
+<div id="upgradeList"></div>
+<button onclick="buyX99()">FOREVER ×99 (5 cookies)</button>
+</div>
+
+<div class="panel">
+<h3>Stats</h3>
+<div id="stats"></div>
+</div>
+
+<div class="panel">
+<h3>Settings / Codes</h3>
+<input id="codeInput" placeholder="Enter code">
+<button onclick="useCode()">Enter Code</button>
+<button onclick="saveLeaderboard()">Save to Leaderboard</button>
+<h4>Leaderboard</h4>
+<div id="leaderboard"></div>
+</div>
+
+</div>
+
+<div id="snow"></div>
+
+<script>
+let cookies=0;
+let cps=0;
+let clickPower=1;
+let lifetime=0;
+let playTime=0;
+let world="cookie";
+let infiniteUsed=false;
+
+let upgrades=[];
+for(let i=1;i<=30;i++){
+  upgrades.push({cost:50*i,power:i});
+}
+
+function update(){
+document.getElementById("cookies").innerText=Math.floor(cookies);
+document.getElementById("cps").innerText=cps;
+document.getElementById("cp").innerText=clickPower;
+document.getElementById("stats").innerHTML=
+"Play Time: "+Math.floor(playTime)+"s<br>"+
+"Lifetime Cookies: "+Math.floor(lifetime)+"<br>"+
+"Clicks Per Second: "+cps+"<br>"+
+"Click Power: "+clickPower;
+}
+
+document.getElementById("mainClick").onclick=function(){
+cookies+=clickPower;
+lifetime+=clickPower;
+update();
+}
+
+function renderUpgrades(){
+let html="";
+upgrades.forEach((u,i)=>{
+html+=`<button onclick="buyUpgrade(${i})">
+Upgrade ${i+1} (+${u.power} CPS) - ${u.cost}
